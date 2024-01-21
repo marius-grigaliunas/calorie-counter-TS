@@ -1,0 +1,190 @@
+:root {
+    --light-grey: #f5f6f7;
+    --dark-blue: #0a0a23;
+    --fcc-blue: #1b1b32;
+    --light-yellow: #fecc4c;
+    --dark-yellow: #feac32;
+    --light-pink: #ffadad;
+    --dark-red: #850000;
+    --light-green: #acd157;
+  }
+  
+  body {
+    font-family: "Lato", Helvetica, Arial, sans-serif;
+    font-size: 18px;
+    background-color: var(--fcc-blue);
+    color: var(--light-grey);
+  }
+  
+  h1 {
+    text-align: center;
+  }
+
+  .container,
+  .calendar-container
+  {
+    width: 90%;
+    max-width: 680px;
+  }
+  
+  h1,
+  .container,
+  .output,
+  .calendar-container{
+    margin: 20px auto;
+  }
+  
+  label,
+  legend {
+    font-weight: bold;
+  }
+  
+  .input-container {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  button {
+    outline: none;
+    cursor: pointer;
+    text-decoration: none;
+    background-color: var(--light-yellow);
+    border: 2px solid var(--dark-yellow);
+  }
+  
+  .clear {
+    background-color: var(--light-pink);
+    color: var(--dark-red);
+    border-color: var(--dark-red);
+  }
+  
+  button,
+  input,
+  select {
+    min-height: 24px;
+    color: var(--dark-blue);
+  }
+  
+  fieldset,
+  label,
+  button,
+  input,
+  select {
+    margin-bottom: 10px;
+  }
+  
+  .output {
+    border: 2px solid var(--light-grey);
+    padding: 10px;
+    text-align: center;
+  }
+  
+  .hide {
+    display: none;
+  }
+  
+  .output span {
+    font-weight: bold;
+    font-size: 1.2em;
+  }
+  
+  .surplus {
+    color: var(--light-green);
+  }
+  
+  .deficit {
+    color: var(--light-pink);
+  }
+
+  .calendar-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+  }
+
+  .current-date {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 10px;
+    width: 70%;
+  }
+
+  .day-names {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    text-align: center;
+    padding-bottom: 15px;
+  }
+
+  .calendar-body {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    grid-template-rows: repeat(6, 1fr);
+    height: 100%;
+  }
+
+  .day {
+    border: 1px solid var(--dark-red);
+    text-align: center;
+    padding: 0.2em;
+    padding-top: 5px;
+    transition: 0.3s;
+  }
+
+  .day:hover {
+    background-color: #3b3b6e;
+  }
+
+  .workday {
+    color: var(--light-pink);
+  }
+
+  .weekend {
+    color: lightblue;
+  }
+
+  .today {
+    background-color: var(--dark-red);
+  }
+
+  .last-month, .next-month{
+    color: gray;
+  }
+
+  .material-symbols-rounded {
+    cursor: pointer;
+    user-select: none;
+  }
+
+  .counter-header {
+    display: flex;
+  }
+
+  #budget-container {
+    width: 50%;
+    height: 50px;
+  }
+
+  #current-full-date {
+    width: 50%;
+    text-align: end;
+  }
+
+  .calorie-data {
+    font-size: 0.7em;
+    margin: 5px 0 0 0;
+    border-radius: 16px;
+    text-align: center;
+    background-color: #0a0a23;
+    color: var(--dark-red);
+    font-weight: bold;
+  }
+
+  .deficit {
+    color: var(--dark-yellow);
+  }
+
+  .surplus {
+    color: var(--dark-red);
+  }
