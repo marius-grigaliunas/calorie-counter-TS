@@ -149,6 +149,7 @@ navButtons[1].addEventListener("click", () => {
       month++;
   }
 
+  
   selectedMonth ? selectedMonth.textContent = months[month] : 'undefined';
   selectedYear ? selectedYear.textContent = year.toString() : 'undefined';
   calendar? calendar.innerHTML = "" : 'undefined';
@@ -160,8 +161,17 @@ navButtons[1].addEventListener("click", () => {
 generateCalendar();
 
 //calorie-counter.js
+/*
+type DataObj = {
+  id : string,
+  balance : number,
+  burned : number,
+  budget : number,
+  calories : []
+};
+
 const calorieCounter = document.getElementById('calorie-counter');
-const budgetNumberInput = document.getElementById('budget');
+const budgetNumberInput = <HTMLInputElement> document.getElementById('budget');
 const entryDropdown = <HTMLInputElement>document.getElementById('entry-dropdown');
 const addEntryButton = document.getElementById('add-entry');
 const clearButton = document.getElementById('clear');
@@ -169,7 +179,7 @@ const deleteStorageButton = document.getElementById("delete");
 const output = document.getElementById('output');
 let isError = false;
 
-localStorage.getItem("data") ? JSON.parse(localStorage.getItem("data") || "{}") : [];
+let journalData = localStorage.getItem("data") ? JSON.parse(localStorage.getItem("data") || "{}") : [];
 
 function cleanInputString(str : string) {
   const regex = /[+-\s]/g;
@@ -204,7 +214,7 @@ function addEntry() {
 
 
 
-/*const addEntryFromInput = (list : []) => {
+const addEntryFromInput = (list : HTMLInputElement[]) => {
 
   if(list.length) {
     const category = list[0].id.split("-")[0];
@@ -224,57 +234,64 @@ function addEntry() {
         value="${value}"
       />
       </div>`;
-      targetContainer.insertAdjacentHTML('beforeend', HTMLString); 
+      targetContainer?.insertAdjacentHTML('beforeend', HTMLString); 
     }
   }
 };
 
-function calculateCalories(e) {
+function calculateCalories(e : Event) {
   e.preventDefault();
   isError = false;
 
-  const breakfastNumberInputs = document.querySelectorAll('#breakfast input[type=number]');
-  const lunchNumberInputs = document.querySelectorAll('#lunch input[type=number]');
-  const dinnerNumberInputs = document.querySelectorAll('#dinner input[type=number]');
-  const snacksNumberInputs = document.querySelectorAll('#snacks input[type=number]');
-  const exerciseNumberInputs = document.querySelectorAll('#exercise input[type=number]');
+  const breakfastNumberInputs = document.querySelectorAll<HTMLInputElement>('#breakfast input[type=number]');
+  const lunchNumberInputs = document.querySelectorAll<HTMLInputElement>('#lunch input[type=number]');
+  const dinnerNumberInputs = document.querySelectorAll<HTMLInputElement>('#dinner input[type=number]');
+  const snacksNumberInputs = document.querySelectorAll<HTMLInputElement>('#snacks input[type=number]');
+  const exerciseNumberInputs = document.querySelectorAll<HTMLInputElement>('#exercise input[type=number]');
 
   const breakfastCalories = getCaloriesFromInputs(breakfastNumberInputs);
   const lunchCalories = getCaloriesFromInputs(lunchNumberInputs);
   const dinnerCalories = getCaloriesFromInputs(dinnerNumberInputs);
   const snacksCalories = getCaloriesFromInputs(snacksNumberInputs);
   const exerciseCalories = getCaloriesFromInputs(exerciseNumberInputs);
-  const budgetCalories = getCaloriesFromInputs([budgetNumberInput]);
+  const budgetCalories = budgetNumberInput ?  getCaloriesFromInputs([budgetNumberInput]) 
+    : alert("Please enter calorie budget");
 
   if (isError) {
     return;
   }
 
-  const consumedCalories = breakfastCalories + lunchCalories + dinnerCalories + snacksCalories;
-  const remainingCalories = budgetCalories - consumedCalories + exerciseCalories;
+  const consumedCalories = (breakfastCalories ? breakfastCalories : 0) +
+     (lunchCalories ? lunchCalories : 0) +
+     (dinnerCalories ? dinnerCalories : 0) + 
+     (snacksCalories ? snacksCalories : 0);
+  const remainingCalories = (budgetCalories ? budgetCalories : 0) - consumedCalories +
+     (exerciseCalories? exerciseCalories : 0);
+  
   const surplusOrDeficit = remainingCalories >= 0 ? 'Deficit' : 'Surplus';
-  output.innerHTML = `
+  output ? output.innerHTML = `
   <span class="${surplusOrDeficit.toLowerCase()}">${Math.abs(remainingCalories)} Calorie ${surplusOrDeficit}</span>
   <hr>
   <p>${budgetCalories} Calories Budgeted</p>
   <p>${consumedCalories} Calories Consumed</p>
   <p>${exerciseCalories} Calories Burned</p>
-  `;
+  ` : "undefined";
 
 
-  console.log(breakfastNumberInputs);
-  createData(budgetCalories ,remainingCalories, exerciseCalories, currentDate,
+  if(budgetCalories && exerciseCalories) {
+    createData(budgetCalories, remainingCalories, exerciseCalories, selectedDate,
     arrayFromList(breakfastNumberInputs), arrayFromList(lunchNumberInputs),
     arrayFromList(dinnerNumberInputs), arrayFromList(snacksNumberInputs),
     arrayFromList(exerciseNumberInputs));
-  insertCalorieData(currentDate, remainingCalories);
-  output.classList.remove('hide');
+  }
+  insertCalorieData(selectedDate, remainingCalories);
+  output?.classList.remove('hide');
 }
 
-const arrayFromList = (list) => {
+const arrayFromList = (list : NodeListOf<HTMLInputElement>) => {
   const arr = [];
 
-  for(i = 0; i < list.length; i++) {
+  for(let i = 0; i < list.length; i++) {
     const obj = {
       id: list[i].id,
       value: list[i].value
@@ -286,8 +303,9 @@ const arrayFromList = (list) => {
   return arr;
 }
 
-const createData = (budget, calorieBalance, caloriesBurned, date, breakfastList, lunchList, dinnerList, snackList, exerciseList) => {
-  const dataArrIndex = journalData.findIndex( item => item.id === date);
+const createData = (budget : number, calorieBalance : number, caloriesBurned : number,
+   date : string , breakfastList : {}, lunchList : {}, dinnerList : {}, snackList : {}, exerciseList : {}) => {
+  const dataArrIndex = journalData.findIndex((item : DataObj) => item.id === date);
   
   const dataObj = {
     id : date,
@@ -307,13 +325,12 @@ const createData = (budget, calorieBalance, caloriesBurned, date, breakfastList,
 
   localStorage.setItem("data", JSON.stringify(journalData));
   //update the counter and calendar
-  console.log(dataObj);
-  console.log(JSON.parse(localStorage.getItem("data")));
 };
 
-function getCaloriesFromInputs(list) {
+function getCaloriesFromInputs(list : NodeListOf<HTMLInputElement> | HTMLInputElement[]) {
   let calories = 0;
 
+  
   for (let i = 0; i < list.length; i++) {
     const currVal = cleanInputString(list[i].value);
     const invalidInputMatch = isInvalidInput(currVal);
@@ -327,6 +344,7 @@ function getCaloriesFromInputs(list) {
   }
   return calories;
 }
+
 
 function clearForm() {
   const inputContainers = Array.from(document.querySelectorAll('.input-container'));
