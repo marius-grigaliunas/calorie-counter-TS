@@ -7,23 +7,24 @@ let year = new Date().getFullYear();
 let month = new Date().getMonth();
 let today = new Date().getDate();
 const calendar = document.querySelector(".calendar-body");
-const currentMonth = document.querySelector(".current-month");
-const currentYear = document.querySelector(".current-year");
+const selectedMonth = document.querySelector(".current-month");
+const selectedYear = document.querySelector(".current-year");
 const navButtons = document.querySelectorAll(".calendar-navigation span");
-const currentFullDate = document.querySelector(".current-full-date");
+const currentFullDate = document.getElementById("current-full-date");
 const months = ["January", "February", "March", "April", "May", "June", "July", "August",
     "September", "October", "November", "December"];
 const days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
-const day_classes = {
-    today: "today",
-    weekend: "weekend",
-    workday: "workday"
-};
 const dateDate = `${today}-${month}-${year}`;
-let currentDate = `${today}-${month}-${year}`;
-currentMonth ? currentMonth.textContent = months[month] : 'undefined';
-currentYear ? currentYear.textContent = year.toString() : 'undefined';
-currentFullDate ? currentFullDate.textContent = `${days[new Date(year, month, today).getDay()]} ${today} ${months[month]} ${year}`
+let selectedDate = `${today}-${month}-${year}`;
+const getFormattedFullDate = (date) => {
+    const day = date.getDate();
+    const month = date.getMonth();
+    const year = date.getFullYear();
+    return `${days[date.getDay()]}  ${day} ${months[month]} ${year}`;
+};
+selectedMonth ? selectedMonth.textContent = months[month] : 'undefined';
+selectedYear ? selectedYear.textContent = year.toString() : 'undefined';
+currentFullDate ? currentFullDate.textContent = getFormattedFullDate(new Date())
     : 'undefined';
 const generateCalendar = () => {
     if (calendar) {
@@ -85,106 +86,298 @@ const generateCalendar = () => {
                 }
             }
         }
-        addClickEvent();
+        addSelectOnClick();
     }
     console.log(calendar);
 };
-const addClickEvent = () => {
-    const daysToClick = document.querySelectorAll(".day");
-    for (let i = 0; i < daysToClick.length; i++) {
-        daysToClick[i].addEventListener("click", () => {
-            var _a, _b;
+const addSelectOnClick = () => {
+    const calendarContainer = document.querySelector(".calendar-body");
+    calendarContainer === null || calendarContainer === void 0 ? void 0 : calendarContainer.addEventListener("click", (e) => {
+        var _a, _b;
+        const clickedDay = e.target.closest(".day");
+        if (clickedDay) {
+            const daysToSelect = document.querySelectorAll(".day");
             if (document.querySelector(".today")) {
                 (_a = document.querySelector(".today")) === null || _a === void 0 ? void 0 : _a.classList.remove("today");
             }
-            daysToClick[i].classList.add("today");
-            currentDate = daysToClick[i].querySelector(".day-number") ? `${(_b = daysToClick[i].querySelector(".day-number")) === null || _b === void 0 ? void 0 : _b.textContent}-${month}-${year}` : `${daysToClick[i].textContent}-${month}-${year}`;
-            const currentDatearray = currentDate.split('-');
-            currentFullDate ? currentFullDate.textContent = `${days[new Date(+currentDatearray[2], +currentDatearray[1], +currentDatearray[0]).getDay()]}  ${currentDatearray[0]} ${months[+currentDatearray[1]]} ${currentDatearray[2]}`
+            clickedDay.classList.add("today");
+            selectedDate = clickedDay.querySelector(".day-number") ? `${(_b = clickedDay.querySelector(".day-number")) === null || _b === void 0 ? void 0 : _b.textContent}-${month}-${year}` : `${clickedDay.textContent}-${month}-${year}`;
+            const selectedDatearray = selectedDate.split('-');
+            currentFullDate ? currentFullDate.textContent = getFormattedFullDate(new Date(+selectedDatearray[2], +selectedDatearray[1], +selectedDatearray[0]))
                 : `undefined`;
-            //updateForm();
-        });
-    }
+        }
+    });
 };
+navButtons[0].addEventListener("click", () => {
+    if (month === 0) {
+        year--;
+        month = 11;
+    }
+    else {
+        month--;
+    }
+    selectedMonth ? selectedMonth.textContent = months[month] : 'undefined';
+    selectedYear ? selectedYear.textContent = year.toString() : 'undefined';
+    calendar ? calendar.innerHTML = "" : 'undefined';
+    generateCalendar();
+    //updateForm();
+});
+navButtons[1].addEventListener("click", () => {
+    if (month === 11) {
+        year++;
+        month = 0;
+    }
+    else {
+        month++;
+    }
+    selectedMonth ? selectedMonth.textContent = months[month] : 'undefined';
+    selectedYear ? selectedYear.textContent = year.toString() : 'undefined';
+    calendar ? calendar.innerHTML = "" : 'undefined';
+    generateCalendar();
+    //updateForm();
+});
 generateCalendar();
-/*const calendar = document.querySelector<HTMLElement>(".calendar-body");
-const currentMonth = document.querySelector<HTMLElement>(".current-month");
-const currentYear = document.querySelector<HTMLElement>(".current-year");
-const currentFullDate = document.querySelector<HTMLElement>(".current-full-date");
-
-const months: string[] = ["January", "February", "March", "April", "May", "June", "July", "August",
-                "September", "October", "November", "December"];
-
-const days: string[] = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
-
-const DAY_CLASSES = {
-  TODAY: "today",
-  WEEKEND: "weekend",
-  WORKDAY: "workday",
-};
-
-let selectedDate: string;
-
-currentMonth?.textContent = months[new Date().getMonth()];
-currentYear?.textContent = new Date().getFullYear().toString();
-currentFullDate?.textContent = getFormattedFullDate(new Date());
-
-const generateCalendar = () => {
-  if (calendar) {
-    const dateLast_MonthPrev = new Date(year, month, 0).getDate();
-    const dateLast = new Date(year, month + 1, 0).getDate();
-    const dayFirst = new Date(year, month, 1).getDay();
-    const dayLast = new Date(year, month, dateLast).getDay();
-
-    for (let i = 1; i <= dateLast; i++) {
-      const day = new Date(year, month, i).getDay();
-
-      if (i === 1 && day !== 1) {
-        // ... (previous code)
-      }
-
-      const dayClass = day === 0 || day === 6 ? DAY_CLASSES.WEEKEND : DAY_CLASSES.WORKDAY;
-
-      // ... (previous code)
+//calorie-counter.js
+const calorieCounter = document.getElementById('calorie-counter');
+const budgetNumberInput = document.getElementById('budget');
+const entryDropdown = document.getElementById('entry-dropdown');
+const addEntryButton = document.getElementById('add-entry');
+const clearButton = document.getElementById('clear');
+const deleteStorageButton = document.getElementById("delete");
+const output = document.getElementById('output');
+let isError = false;
+localStorage.getItem("data") ? JSON.parse(localStorage.getItem("data") || "{}") : [];
+function cleanInputString(str) {
+    const regex = /[+-\s]/g;
+    return str.replace(regex, '');
+}
+function isInvalidInput(str) {
+    const regex = /\d+e\d+/i;
+    return str.match(regex);
+}
+function addEntry() {
+    if (entryDropdown) {
+        const targetInputContainer = document.querySelector(`#${entryDropdown.value} .input-container`);
+        if (targetInputContainer) {
+            const entryNumber = targetInputContainer.querySelectorAll('input[type="number"]').length + 1;
+            const HTMLString = `
+      <div class="meal-container">
+      <label for="${entryDropdown.value}-${entryNumber}-calories">Meal ${entryNumber} Calories</label>
+      <input
+        type="number"
+        min="0"
+        id="${entryDropdown.value}-${entryNumber}-calories"
+        placeholder="Calories"
+      />
+      </div>`;
+            targetInputContainer.insertAdjacentHTML('beforeend', HTMLString);
+        }
     }
+}
+/*const addEntryFromInput = (list : []) => {
 
-    if (dayLast !== 0) {
-      for (let i = dayLast + 1; i <= 7; i++) {
-        // ... (previous code)
-      }
+  if(list.length) {
+    const category = list[0].id.split("-")[0];
+    const targetContainer = document.querySelector(`#${category} .input-container`);
+
+    for(let i = 0; i < list.length; i++) {
+      const entryNumber = list[i].id.split('-')[1];
+      const value = list[i].value;
+      const HTMLString = `
+      <div class="meal-container">
+      <label for="${category}-${entryNumber}-calories">${category === 'exercise' ? 'Exercise' : 'Meal'} ${entryNumber} Calories</label>
+      <input
+        type="number"
+        min="0"
+        id="${category}-${entryNumber}-calories"
+        placeholder="Calories"
+        value="${value}"
+      />
+      </div>`;
+      targetContainer.insertAdjacentHTML('beforeend', HTMLString);
     }
-    addClickEvent();
   }
-  console.log(calendar);
 };
 
-const addClickEvent = () => {
-  const calendarContainer = document.querySelector<HTMLElement>(".calendar-body");
+function calculateCalories(e) {
+  e.preventDefault();
+  isError = false;
 
-  calendarContainer?.addEventListener("click", (event) => {
-    const clickedDay = (event.target as HTMLElement).closest(".day");
-    if (clickedDay) {
-      const daysToClick = document.querySelectorAll<HTMLElement>(".day");
-      daysToClick.forEach(day => day.classList.remove(DAY_CLASSES.TODAY));
+  const breakfastNumberInputs = document.querySelectorAll('#breakfast input[type=number]');
+  const lunchNumberInputs = document.querySelectorAll('#lunch input[type=number]');
+  const dinnerNumberInputs = document.querySelectorAll('#dinner input[type=number]');
+  const snacksNumberInputs = document.querySelectorAll('#snacks input[type=number]');
+  const exerciseNumberInputs = document.querySelectorAll('#exercise input[type=number]');
 
-      clickedDay.classList.add(DAY_CLASSES.TODAY);
+  const breakfastCalories = getCaloriesFromInputs(breakfastNumberInputs);
+  const lunchCalories = getCaloriesFromInputs(lunchNumberInputs);
+  const dinnerCalories = getCaloriesFromInputs(dinnerNumberInputs);
+  const snacksCalories = getCaloriesFromInputs(snacksNumberInputs);
+  const exerciseCalories = getCaloriesFromInputs(exerciseNumberInputs);
+  const budgetCalories = getCaloriesFromInputs([budgetNumberInput]);
 
-      selectedDate = clickedDay.textContent
-        ? `${clickedDay.textContent}-${month}-${year}`
-        : `${clickedDay.querySelector<HTMLElement>(".day-number")?.textContent}-${month}-${year}`;
+  if (isError) {
+    return;
+  }
 
-      const currentDateArray = selectedDate.split('-');
-      currentFullDate?.textContent = `${days[new Date(+currentDateArray[2], +currentDateArray[1], +currentDateArray[0]).getDay()]}  ${currentDateArray[0]} ${months[+currentDateArray[1]]} ${currentDateArray[2]}`;
-      //updateForm();
+  const consumedCalories = breakfastCalories + lunchCalories + dinnerCalories + snacksCalories;
+  const remainingCalories = budgetCalories - consumedCalories + exerciseCalories;
+  const surplusOrDeficit = remainingCalories >= 0 ? 'Deficit' : 'Surplus';
+  output.innerHTML = `
+  <span class="${surplusOrDeficit.toLowerCase()}">${Math.abs(remainingCalories)} Calorie ${surplusOrDeficit}</span>
+  <hr>
+  <p>${budgetCalories} Calories Budgeted</p>
+  <p>${consumedCalories} Calories Consumed</p>
+  <p>${exerciseCalories} Calories Burned</p>
+  `;
+
+
+  console.log(breakfastNumberInputs);
+  createData(budgetCalories ,remainingCalories, exerciseCalories, currentDate,
+    arrayFromList(breakfastNumberInputs), arrayFromList(lunchNumberInputs),
+    arrayFromList(dinnerNumberInputs), arrayFromList(snacksNumberInputs),
+    arrayFromList(exerciseNumberInputs));
+  insertCalorieData(currentDate, remainingCalories);
+  output.classList.remove('hide');
+}
+
+const arrayFromList = (list) => {
+  const arr = [];
+
+  for(i = 0; i < list.length; i++) {
+    const obj = {
+      id: list[i].id,
+      value: list[i].value
     }
-  });
+
+    arr.push(obj);
+  }
+
+  return arr;
+}
+
+const createData = (budget, calorieBalance, caloriesBurned, date, breakfastList, lunchList, dinnerList, snackList, exerciseList) => {
+  const dataArrIndex = journalData.findIndex( item => item.id === date);
+  
+  const dataObj = {
+    id : date,
+    balance: calorieBalance,
+    burned: caloriesBurned,
+    budget: budget,
+    calories: [breakfastList, lunchList, dinnerList, snackList, exerciseList]
+  };
+
+  if(dataArrIndex === -1) {
+    journalData.push(dataObj);
+  } else {
+    journalData[dataArrIndex] = dataObj;
+  }
+
+
+
+  localStorage.setItem("data", JSON.stringify(journalData));
+  //update the counter and calendar
+  console.log(dataObj);
+  console.log(JSON.parse(localStorage.getItem("data")));
 };
 
-const getFormattedFullDate = (date: Date): string => {
-  const day = date.getDate();
-  const month = date.getMonth();
-  const year = date.getFullYear();
-  return `${days[date.getDay()]} ${day} ${months[month]} ${year}`;
+function getCaloriesFromInputs(list) {
+  let calories = 0;
+
+  for (let i = 0; i < list.length; i++) {
+    const currVal = cleanInputString(list[i].value);
+    const invalidInputMatch = isInvalidInput(currVal);
+
+    if (invalidInputMatch) {
+      alert(`Invalid Input: ${invalidInputMatch[0]}`);
+      isError = true;
+      return null;
+    }
+    calories += Number(currVal);
+  }
+  return calories;
+}
+
+function clearForm() {
+  const inputContainers = Array.from(document.querySelectorAll('.input-container'));
+
+  for (let i = 0; i < inputContainers.length; i++) {
+    inputContainers[i].innerHTML = '';
+  }
+
+  budgetNumberInput.value = '';
+  output.innerText = '';
+  output.classList.add('hide');
+}
+
+const deleteDay = (dateToDelete) => {
+  if(journalData.length !== 0) {
+    for(let i = 0; i < journalData.length; i++) {
+      if(journalData[i].id === dateToDelete) {
+        journalData.splice(i, 1);
+        console.log("yes");
+      }
+    }
+  }
+
+  localStorage.setItem("data", JSON.stringify(journalData));
+  calendar.innerHTML = "";
+  generateCalendar();
+  let currentDate = `${today}-${month}-${year}`;
+  const currentDatearray = currentDate.split('-');
+  currentFullDate.innerText = `${days[new Date(currentDatearray[2], currentDatearray[1], currentDatearray[0]).getDay()]}  ${currentDatearray[0]} ${months[currentDatearray[1]]} ${currentDatearray[2]}`
+
+  updateForm();
+}
+
+const insertCalorieData = (day, calorieBalance) => {
+  const targetDay = document.getElementById(day);
+  const stringHTML = `
+  <div class="day-number">
+    ${day.split('-')[0]}
+  </div>
+  <div class="calorie-data ${calorieBalance >= 0 ? "deficit" : "surplus"}">
+      ${Math.abs(calorieBalance)}
+  </div>`;
+
+  targetDay.innerHTML = stringHTML;
+
 };
 
-generateCalendar();*/
+const updateForm = () => {
+  if(journalData.length !== 0) {
+    for(let i = 0; i < journalData.length; i++) {
+      if(journalData[i].id.split('-')[1] == month){
+        console.log("why");
+        insertCalorieData(journalData[i].id, journalData[i].balance);
+      }
+    }
+
+    for(let i = 0; i < journalData.length; i++) {
+      if(journalData[i].id === currentDate) {
+        console.log(journalData[i], i);
+        clearForm();
+
+        budgetNumberInput.value = journalData[i].budget;
+        for(let j = 0; j < journalData[i].calories.length; j++) {
+          addEntryFromInput(journalData[i].calories[j]);
+        }
+        break;
+      } else {
+        clearForm();
+      }
+    }
+  }
+};
+
+addEntryButton.addEventListener("click", addEntry);
+calorieCounter.addEventListener("submit", calculateCalories);
+clearButton.addEventListener("click", () => {
+  deleteDay(currentDate);
+  clearForm();
+});
+deleteStorageButton.addEventListener("click", () => {
+  localStorage.clear();
+})
+
+updateForm();*/
