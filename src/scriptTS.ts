@@ -97,8 +97,6 @@ const generateCalendar = () => {
         }
         addSelectOnClick();
     }
-
-    console.log(calendar);
 };
 
 const addSelectOnClick = () => {
@@ -121,6 +119,8 @@ const addSelectOnClick = () => {
       const selectedDatearray = selectedDate.split('-');
       currentFullDate ? currentFullDate.textContent = getFormattedFullDate(new Date(+selectedDatearray[2], +selectedDatearray[1], +selectedDatearray[0]))
         : `undefined`;
+
+      updateForm();
     }
   });
 };
@@ -138,7 +138,7 @@ navButtons[0].addEventListener("click", () => {
   calendar? calendar.innerHTML = "" : 'undefined';
   generateCalendar();
   
-  //updateForm();
+  updateForm();
 });
 
 navButtons[1].addEventListener("click", () => {
@@ -155,13 +155,13 @@ navButtons[1].addEventListener("click", () => {
   calendar? calendar.innerHTML = "" : 'undefined';
   generateCalendar();
   
-  //updateForm();
+  updateForm();
 });
 
 generateCalendar();
 
 //calorie-counter.js
-/*
+
 type DataObj = {
   id : string,
   balance : number,
@@ -278,13 +278,15 @@ function calculateCalories(e : Event) {
   ` : "undefined";
 
 
-  if(budgetCalories && exerciseCalories) {
-    createData(budgetCalories, remainingCalories, exerciseCalories, selectedDate,
+  if(budgetCalories) {
+    createData(budgetCalories, remainingCalories, exerciseCalories ? exerciseCalories : 0, selectedDate,
     arrayFromList(breakfastNumberInputs), arrayFromList(lunchNumberInputs),
     arrayFromList(dinnerNumberInputs), arrayFromList(snacksNumberInputs),
     arrayFromList(exerciseNumberInputs));
   }
+
   insertCalorieData(selectedDate, remainingCalories);
+
   output?.classList.remove('hide');
 }
 
@@ -354,41 +356,40 @@ function clearForm() {
   }
 
   budgetNumberInput.value = '';
-  output.innerText = '';
-  output.classList.add('hide');
+  output ? output.textContent = '' : "";
+  output?.classList.add('hide');
 }
 
-const deleteDay = (dateToDelete) => {
+const deleteDay = (dateToDelete : string) => {
   if(journalData.length !== 0) {
     for(let i = 0; i < journalData.length; i++) {
       if(journalData[i].id === dateToDelete) {
         journalData.splice(i, 1);
-        console.log("yes");
       }
     }
   }
 
   localStorage.setItem("data", JSON.stringify(journalData));
-  calendar.innerHTML = "";
+  calendar ? calendar.innerHTML = "" : "";
   generateCalendar();
   let currentDate = `${today}-${month}-${year}`;
   const currentDatearray = currentDate.split('-');
-  currentFullDate.innerText = `${days[new Date(currentDatearray[2], currentDatearray[1], currentDatearray[0]).getDay()]}  ${currentDatearray[0]} ${months[currentDatearray[1]]} ${currentDatearray[2]}`
+  currentFullDate ? currentFullDate.innerText = getFormattedFullDate(new Date(+currentDatearray[2], +currentDatearray[1], +currentDate[0])) :
+    "undefined";
 
   updateForm();
 }
 
-const insertCalorieData = (day, calorieBalance) => {
+const insertCalorieData = (day : string, calorieBalance : number) => {
   const targetDay = document.getElementById(day);
   const stringHTML = `
-  <div class="day-number">
-    ${day.split('-')[0]}
-  </div>
+  <div class="day-number">${day.split('-')[0]}</div>
   <div class="calorie-data ${calorieBalance >= 0 ? "deficit" : "surplus"}">
       ${Math.abs(calorieBalance)}
   </div>`;
 
-  targetDay.innerHTML = stringHTML;
+
+  targetDay ? targetDay.innerHTML = stringHTML : "undefined";
 
 }; 
 
@@ -396,14 +397,12 @@ const updateForm = () => {
   if(journalData.length !== 0) {
     for(let i = 0; i < journalData.length; i++) {
       if(journalData[i].id.split('-')[1] == month){
-        console.log("why");
         insertCalorieData(journalData[i].id, journalData[i].balance);
       }
     }
 
     for(let i = 0; i < journalData.length; i++) {
-      if(journalData[i].id === currentDate) {
-        console.log(journalData[i], i);
+      if(journalData[i].id === selectedDate) {
         clearForm();
 
         budgetNumberInput.value = journalData[i].budget;
@@ -418,14 +417,14 @@ const updateForm = () => {
   }
 };
 
-addEntryButton.addEventListener("click", addEntry);
-calorieCounter.addEventListener("submit", calculateCalories);
-clearButton.addEventListener("click", () => {
-  deleteDay(currentDate);
+addEntryButton?.addEventListener("click", addEntry);
+calorieCounter?.addEventListener("submit", calculateCalories);
+clearButton?.addEventListener("click", () => {
+  deleteDay(selectedDate);
   clearForm();
 });
-deleteStorageButton.addEventListener("click", () => {
+deleteStorageButton?.addEventListener("click", () => {
   localStorage.clear();
 })
 
-updateForm();*/
+updateForm();

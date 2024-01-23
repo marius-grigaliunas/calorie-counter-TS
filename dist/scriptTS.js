@@ -88,7 +88,6 @@ const generateCalendar = () => {
         }
         addSelectOnClick();
     }
-    console.log(calendar);
 };
 const addSelectOnClick = () => {
     const calendarContainer = document.querySelector(".calendar-body");
@@ -105,6 +104,7 @@ const addSelectOnClick = () => {
             const selectedDatearray = selectedDate.split('-');
             currentFullDate ? currentFullDate.textContent = getFormattedFullDate(new Date(+selectedDatearray[2], +selectedDatearray[1], +selectedDatearray[0]))
                 : `undefined`;
+            updateForm();
         }
     });
 };
@@ -120,7 +120,7 @@ navButtons[0].addEventListener("click", () => {
     selectedYear ? selectedYear.textContent = year.toString() : 'undefined';
     calendar ? calendar.innerHTML = "" : 'undefined';
     generateCalendar();
-    //updateForm();
+    updateForm();
 });
 navButtons[1].addEventListener("click", () => {
     if (month === 11) {
@@ -134,10 +134,9 @@ navButtons[1].addEventListener("click", () => {
     selectedYear ? selectedYear.textContent = year.toString() : 'undefined';
     calendar ? calendar.innerHTML = "" : 'undefined';
     generateCalendar();
-    //updateForm();
+    updateForm();
 });
 generateCalendar();
-//calorie-counter.js
 const calorieCounter = document.getElementById('calorie-counter');
 const budgetNumberInput = document.getElementById('budget');
 const entryDropdown = document.getElementById('entry-dropdown');
@@ -146,7 +145,7 @@ const clearButton = document.getElementById('clear');
 const deleteStorageButton = document.getElementById("delete");
 const output = document.getElementById('output');
 let isError = false;
-localStorage.getItem("data") ? JSON.parse(localStorage.getItem("data") || "{}") : [];
+let journalData = localStorage.getItem("data") ? JSON.parse(localStorage.getItem("data") || "{}") : [];
 function cleanInputString(str) {
     const regex = /[+-\s]/g;
     return str.replace(regex, '');
@@ -174,16 +173,14 @@ function addEntry() {
         }
     }
 }
-/*const addEntryFromInput = (list : []) => {
-
-  if(list.length) {
-    const category = list[0].id.split("-")[0];
-    const targetContainer = document.querySelector(`#${category} .input-container`);
-
-    for(let i = 0; i < list.length; i++) {
-      const entryNumber = list[i].id.split('-')[1];
-      const value = list[i].value;
-      const HTMLString = `
+const addEntryFromInput = (list) => {
+    if (list.length) {
+        const category = list[0].id.split("-")[0];
+        const targetContainer = document.querySelector(`#${category} .input-container`);
+        for (let i = 0; i < list.length; i++) {
+            const entryNumber = list[i].id.split('-')[1];
+            const value = list[i].value;
+            const HTMLString = `
       <div class="meal-container">
       <label for="${category}-${entryNumber}-calories">${category === 'exercise' ? 'Exercise' : 'Meal'} ${entryNumber} Calories</label>
       <input
@@ -194,190 +191,155 @@ function addEntry() {
         value="${value}"
       />
       </div>`;
-      targetContainer.insertAdjacentHTML('beforeend', HTMLString);
+            targetContainer === null || targetContainer === void 0 ? void 0 : targetContainer.insertAdjacentHTML('beforeend', HTMLString);
+        }
     }
-  }
 };
-
 function calculateCalories(e) {
-  e.preventDefault();
-  isError = false;
-
-  const breakfastNumberInputs = document.querySelectorAll('#breakfast input[type=number]');
-  const lunchNumberInputs = document.querySelectorAll('#lunch input[type=number]');
-  const dinnerNumberInputs = document.querySelectorAll('#dinner input[type=number]');
-  const snacksNumberInputs = document.querySelectorAll('#snacks input[type=number]');
-  const exerciseNumberInputs = document.querySelectorAll('#exercise input[type=number]');
-
-  const breakfastCalories = getCaloriesFromInputs(breakfastNumberInputs);
-  const lunchCalories = getCaloriesFromInputs(lunchNumberInputs);
-  const dinnerCalories = getCaloriesFromInputs(dinnerNumberInputs);
-  const snacksCalories = getCaloriesFromInputs(snacksNumberInputs);
-  const exerciseCalories = getCaloriesFromInputs(exerciseNumberInputs);
-  const budgetCalories = getCaloriesFromInputs([budgetNumberInput]);
-
-  if (isError) {
-    return;
-  }
-
-  const consumedCalories = breakfastCalories + lunchCalories + dinnerCalories + snacksCalories;
-  const remainingCalories = budgetCalories - consumedCalories + exerciseCalories;
-  const surplusOrDeficit = remainingCalories >= 0 ? 'Deficit' : 'Surplus';
-  output.innerHTML = `
+    e.preventDefault();
+    isError = false;
+    const breakfastNumberInputs = document.querySelectorAll('#breakfast input[type=number]');
+    const lunchNumberInputs = document.querySelectorAll('#lunch input[type=number]');
+    const dinnerNumberInputs = document.querySelectorAll('#dinner input[type=number]');
+    const snacksNumberInputs = document.querySelectorAll('#snacks input[type=number]');
+    const exerciseNumberInputs = document.querySelectorAll('#exercise input[type=number]');
+    const breakfastCalories = getCaloriesFromInputs(breakfastNumberInputs);
+    const lunchCalories = getCaloriesFromInputs(lunchNumberInputs);
+    const dinnerCalories = getCaloriesFromInputs(dinnerNumberInputs);
+    const snacksCalories = getCaloriesFromInputs(snacksNumberInputs);
+    const exerciseCalories = getCaloriesFromInputs(exerciseNumberInputs);
+    const budgetCalories = budgetNumberInput ? getCaloriesFromInputs([budgetNumberInput])
+        : alert("Please enter calorie budget");
+    if (isError) {
+        return;
+    }
+    const consumedCalories = (breakfastCalories ? breakfastCalories : 0) +
+        (lunchCalories ? lunchCalories : 0) +
+        (dinnerCalories ? dinnerCalories : 0) +
+        (snacksCalories ? snacksCalories : 0);
+    const remainingCalories = (budgetCalories ? budgetCalories : 0) - consumedCalories +
+        (exerciseCalories ? exerciseCalories : 0);
+    const surplusOrDeficit = remainingCalories >= 0 ? 'Deficit' : 'Surplus';
+    output ? output.innerHTML = `
   <span class="${surplusOrDeficit.toLowerCase()}">${Math.abs(remainingCalories)} Calorie ${surplusOrDeficit}</span>
   <hr>
   <p>${budgetCalories} Calories Budgeted</p>
   <p>${consumedCalories} Calories Consumed</p>
   <p>${exerciseCalories} Calories Burned</p>
-  `;
-
-
-  console.log(breakfastNumberInputs);
-  createData(budgetCalories ,remainingCalories, exerciseCalories, currentDate,
-    arrayFromList(breakfastNumberInputs), arrayFromList(lunchNumberInputs),
-    arrayFromList(dinnerNumberInputs), arrayFromList(snacksNumberInputs),
-    arrayFromList(exerciseNumberInputs));
-  insertCalorieData(currentDate, remainingCalories);
-  output.classList.remove('hide');
+  ` : "undefined";
+    if (budgetCalories) {
+        createData(budgetCalories, remainingCalories, exerciseCalories ? exerciseCalories : 0, selectedDate, arrayFromList(breakfastNumberInputs), arrayFromList(lunchNumberInputs), arrayFromList(dinnerNumberInputs), arrayFromList(snacksNumberInputs), arrayFromList(exerciseNumberInputs));
+    }
+    insertCalorieData(selectedDate, remainingCalories);
+    output === null || output === void 0 ? void 0 : output.classList.remove('hide');
 }
-
 const arrayFromList = (list) => {
-  const arr = [];
-
-  for(i = 0; i < list.length; i++) {
-    const obj = {
-      id: list[i].id,
-      value: list[i].value
+    const arr = [];
+    for (let i = 0; i < list.length; i++) {
+        const obj = {
+            id: list[i].id,
+            value: list[i].value
+        };
+        arr.push(obj);
     }
-
-    arr.push(obj);
-  }
-
-  return arr;
-}
-
-const createData = (budget, calorieBalance, caloriesBurned, date, breakfastList, lunchList, dinnerList, snackList, exerciseList) => {
-  const dataArrIndex = journalData.findIndex( item => item.id === date);
-  
-  const dataObj = {
-    id : date,
-    balance: calorieBalance,
-    burned: caloriesBurned,
-    budget: budget,
-    calories: [breakfastList, lunchList, dinnerList, snackList, exerciseList]
-  };
-
-  if(dataArrIndex === -1) {
-    journalData.push(dataObj);
-  } else {
-    journalData[dataArrIndex] = dataObj;
-  }
-
-
-
-  localStorage.setItem("data", JSON.stringify(journalData));
-  //update the counter and calendar
-  console.log(dataObj);
-  console.log(JSON.parse(localStorage.getItem("data")));
+    return arr;
 };
-
+const createData = (budget, calorieBalance, caloriesBurned, date, breakfastList, lunchList, dinnerList, snackList, exerciseList) => {
+    const dataArrIndex = journalData.findIndex((item) => item.id === date);
+    const dataObj = {
+        id: date,
+        balance: calorieBalance,
+        burned: caloriesBurned,
+        budget: budget,
+        calories: [breakfastList, lunchList, dinnerList, snackList, exerciseList]
+    };
+    if (dataArrIndex === -1) {
+        journalData.push(dataObj);
+    }
+    else {
+        journalData[dataArrIndex] = dataObj;
+    }
+    localStorage.setItem("data", JSON.stringify(journalData));
+    //update the counter and calendar
+};
 function getCaloriesFromInputs(list) {
-  let calories = 0;
-
-  for (let i = 0; i < list.length; i++) {
-    const currVal = cleanInputString(list[i].value);
-    const invalidInputMatch = isInvalidInput(currVal);
-
-    if (invalidInputMatch) {
-      alert(`Invalid Input: ${invalidInputMatch[0]}`);
-      isError = true;
-      return null;
+    let calories = 0;
+    for (let i = 0; i < list.length; i++) {
+        const currVal = cleanInputString(list[i].value);
+        const invalidInputMatch = isInvalidInput(currVal);
+        if (invalidInputMatch) {
+            alert(`Invalid Input: ${invalidInputMatch[0]}`);
+            isError = true;
+            return null;
+        }
+        calories += Number(currVal);
     }
-    calories += Number(currVal);
-  }
-  return calories;
+    return calories;
 }
-
 function clearForm() {
-  const inputContainers = Array.from(document.querySelectorAll('.input-container'));
-
-  for (let i = 0; i < inputContainers.length; i++) {
-    inputContainers[i].innerHTML = '';
-  }
-
-  budgetNumberInput.value = '';
-  output.innerText = '';
-  output.classList.add('hide');
-}
-
-const deleteDay = (dateToDelete) => {
-  if(journalData.length !== 0) {
-    for(let i = 0; i < journalData.length; i++) {
-      if(journalData[i].id === dateToDelete) {
-        journalData.splice(i, 1);
-        console.log("yes");
-      }
+    const inputContainers = Array.from(document.querySelectorAll('.input-container'));
+    for (let i = 0; i < inputContainers.length; i++) {
+        inputContainers[i].innerHTML = '';
     }
-  }
-
-  localStorage.setItem("data", JSON.stringify(journalData));
-  calendar.innerHTML = "";
-  generateCalendar();
-  let currentDate = `${today}-${month}-${year}`;
-  const currentDatearray = currentDate.split('-');
-  currentFullDate.innerText = `${days[new Date(currentDatearray[2], currentDatearray[1], currentDatearray[0]).getDay()]}  ${currentDatearray[0]} ${months[currentDatearray[1]]} ${currentDatearray[2]}`
-
-  updateForm();
+    budgetNumberInput.value = '';
+    output ? output.textContent = '' : "";
+    output === null || output === void 0 ? void 0 : output.classList.add('hide');
 }
-
+const deleteDay = (dateToDelete) => {
+    if (journalData.length !== 0) {
+        for (let i = 0; i < journalData.length; i++) {
+            if (journalData[i].id === dateToDelete) {
+                journalData.splice(i, 1);
+            }
+        }
+    }
+    localStorage.setItem("data", JSON.stringify(journalData));
+    calendar ? calendar.innerHTML = "" : "";
+    generateCalendar();
+    let currentDate = `${today}-${month}-${year}`;
+    const currentDatearray = currentDate.split('-');
+    currentFullDate ? currentFullDate.innerText = getFormattedFullDate(new Date(+currentDatearray[2], +currentDatearray[1], +currentDate[0])) :
+        "undefined";
+    updateForm();
+};
 const insertCalorieData = (day, calorieBalance) => {
-  const targetDay = document.getElementById(day);
-  const stringHTML = `
-  <div class="day-number">
-    ${day.split('-')[0]}
-  </div>
+    const targetDay = document.getElementById(day);
+    const stringHTML = `
+  <div class="day-number">${day.split('-')[0]}</div>
   <div class="calorie-data ${calorieBalance >= 0 ? "deficit" : "surplus"}">
       ${Math.abs(calorieBalance)}
   </div>`;
-
-  targetDay.innerHTML = stringHTML;
-
+    targetDay ? targetDay.innerHTML = stringHTML : "undefined";
 };
-
 const updateForm = () => {
-  if(journalData.length !== 0) {
-    for(let i = 0; i < journalData.length; i++) {
-      if(journalData[i].id.split('-')[1] == month){
-        console.log("why");
-        insertCalorieData(journalData[i].id, journalData[i].balance);
-      }
-    }
-
-    for(let i = 0; i < journalData.length; i++) {
-      if(journalData[i].id === currentDate) {
-        console.log(journalData[i], i);
-        clearForm();
-
-        budgetNumberInput.value = journalData[i].budget;
-        for(let j = 0; j < journalData[i].calories.length; j++) {
-          addEntryFromInput(journalData[i].calories[j]);
+    if (journalData.length !== 0) {
+        for (let i = 0; i < journalData.length; i++) {
+            if (journalData[i].id.split('-')[1] == month) {
+                insertCalorieData(journalData[i].id, journalData[i].balance);
+            }
         }
-        break;
-      } else {
-        clearForm();
-      }
+        for (let i = 0; i < journalData.length; i++) {
+            if (journalData[i].id === selectedDate) {
+                clearForm();
+                budgetNumberInput.value = journalData[i].budget;
+                for (let j = 0; j < journalData[i].calories.length; j++) {
+                    addEntryFromInput(journalData[i].calories[j]);
+                }
+                break;
+            }
+            else {
+                clearForm();
+            }
+        }
     }
-  }
 };
-
-addEntryButton.addEventListener("click", addEntry);
-calorieCounter.addEventListener("submit", calculateCalories);
-clearButton.addEventListener("click", () => {
-  deleteDay(currentDate);
-  clearForm();
+addEntryButton === null || addEntryButton === void 0 ? void 0 : addEntryButton.addEventListener("click", addEntry);
+calorieCounter === null || calorieCounter === void 0 ? void 0 : calorieCounter.addEventListener("submit", calculateCalories);
+clearButton === null || clearButton === void 0 ? void 0 : clearButton.addEventListener("click", () => {
+    deleteDay(selectedDate);
+    clearForm();
 });
-deleteStorageButton.addEventListener("click", () => {
-  localStorage.clear();
-})
-
-updateForm();*/
+deleteStorageButton === null || deleteStorageButton === void 0 ? void 0 : deleteStorageButton.addEventListener("click", () => {
+    localStorage.clear();
+});
+updateForm();
